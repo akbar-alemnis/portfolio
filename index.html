@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aliakbar Rezapour — Portfolio</title>
+  <meta name="description" content="Embedded • C#/.NET • Automation" />
+  <style>
+    /* ===== Matrix-style theme ===== */
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    :root{
+      --bg:#050805;
+      --grid:#0f1f0f;
+      --green:#3CFF7F;
+      --dim:#9be9b8;
+      --glass: rgba(10,20,10,.45);
+      --border: rgba(60,255,127,.25);
+    }
+    body{
+      margin:0; color:#c7ffd6; background: var(--bg);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      line-height:1.6; overflow-x:hidden;
+    }
+
+    /* code rain background */
+    canvas#codeRain{ position: fixed; inset:0; z-index:-2; opacity:.18; }
+    .grid{
+      position:fixed; inset:0; z-index:-1;
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 28px 28px, 28px 28px; mix-blend-mode: screen;
+    }
+
+    /* layout */
+    .wrap{ display:grid; grid-template-columns: 280px 1fr; min-height:100dvh; }
+    @media (max-width: 900px){ .wrap{ grid-template-columns: 1fr; } }
+
+    /* sidebar */
+    .side{
+      position: sticky; top:0; align-self:start; height:100dvh;
+      padding:24px 18px; border-right:1px dashed var(--border);
+      background: linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,0));
+    }
+    @media (max-width: 900px){
+      .side{ position:relative; height:auto; border-right:none; border-bottom:1px dashed var(--border); }
+    }
+    .brand{ display:flex; align-items:center; gap:12px; }
+    .logo{
+      width:36px; height:36px; border-radius:6px;
+      background: radial-gradient(circle at 30% 30%, #00ff95, #00b34a);
+      box-shadow: 0 0 14px #00ff95;
+    }
+    .brand h1{ font-size:18px; margin:0; letter-spacing:.4px; }
+    .muted{ color: var(--dim); opacity:.85; }
+
+    nav{ margin-top:18px; display:grid; gap:8px; }
+    .btn{
+      appearance:none; border:1px dashed var(--border); background: var(--glass);
+      padding:10px 12px; border-radius:10px; color:#c7ffd6; text-decoration:none;
+      display:flex; justify-content:space-between; align-items:center;
+      transition: transform .08s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    .btn small{ opacity:.7; }
+    .btn:hover{
+      transform:translateY(-2px);
+      box-shadow:0 0 0 2px rgba(60,255,127,.16), 0 8px 24px rgba(0,0,0,.28);
+      border-color: var(--green);
+    }
+
+    .status{
+      margin-top:18px; padding:12px; border:1px dashed var(--border);
+      border-radius:10px; background: var(--glass); font-size:13px;
+    }
+
+    /* content */
+    main{ padding:36px 24px 80px; }
+    section{ margin:0 auto 48px; max-width: 1000px; }
+    /* Consistent panels (no color shift on scroll) */
+    .panel{
+      padding:18px; border-radius:12px; background: var(--glass);
+      border: 1px dashed var(--border); box-shadow: 0 8px 24px rgba(0,0,0,.25);
+    }
+    .section-title{
+      display:flex; align-items:center; gap:10px; font-weight:700;
+      letter-spacing:.05em; margin:0 0 14px;
+    }
+    .section-title::before{ content:"$"; color: var(--green); }
+
+    /* terminal */
+    .term{ border-radius:12px; overflow:hidden; border:1px solid rgba(60,255,127,.22); box-shadow: 0 0 0 2px rgba(60,255,127,.08); }
+    .term-head{ display:flex; align-items:center; gap:8px; padding:10px 12px; background: rgba(6,12,6,.8); border-bottom:1px solid rgba(60,255,127,.22); color:var(--dim) }
+    .dot{ width:10px; height:10px; border-radius:50%; background:#244; box-shadow: inset 0 0 6px rgba(60,255,127,.35) }
+    .dot.g{ background: var(--green); }
+    .term-body{ padding:18px; background: rgba(3,8,3,.6); }
+    .prompt{ color: var(--green); }
+    .caret{ display:inline-block; width:10px; background: var(--green); height:1.15em; vertical-align:-0.2em; animation: blink 1s step-end infinite; }
+    @keyframes blink{ 50%{ opacity:0 } }
+
+    /* cards */
+    .grid-2{ display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 820px){ .grid-2{ grid-template-columns: 1fr; } }
+    .card{ border:1px dashed var(--border); border-radius:12px; padding:14px; background: var(--glass); }
+    .card h3{ margin:0 0 6px; font-size:16px; }
+    .meta{ font-size:13px; opacity:.85; color: var(--dim); }
+    .tags{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .tag{ font-size:12px; padding:3px 8px; border-radius:999px; border:1px solid rgba(60,255,127,.35); background: rgba(60,255,127,.08); }
+
+    /* links */
+    a{ color: var(--green); }
+    a:hover{ text-shadow: 0 0 8px rgba(60,255,127,.6); }
+
+    /* footer */
+    footer{ text-align:center; padding: 40px 20px; opacity: .85; font-size: 14px; }
+
+    /* console window fixed size */
+    #console .term-body{ padding:0; }
+    #console-output{ height:180px; overflow:auto; padding:14px 14px 0; white-space:pre-wrap; }
+    #console-input{ height:40px; }
+  </style>
+</head>
+<body>
+  <canvas id="codeRain"></canvas>
+  <div class="grid"></div>
+
+  <div class="wrap">
+    <aside class="side">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Aliakbar Rezapour</h1>
+          <div class="muted">Embedded → C#/.NET → Automation</div>
+        </div>
+      </div>
+
+      <nav>
+        <a class="btn" href="#about"><span>about</span><small>~/whoami</small></a>
+        <a class="btn" href="#skills"><span>skills</span><small>~/stack</small></a>
+        <a class="btn" href="#projects"><span>projects</span><small>~/builds</small></a>
+        <a class="btn" href="#experience"><span>experience</span><small>~/timeline</small></a>
+        <a class="btn" href="#contact"><span>contact</span><small>~/ping</small></a>
+      </nav>
+
+      <div class="status">
+        <div><strong>$ status</strong></div>
+        <div>location: Switzerland</div>
+        <div>roles: lead dev • embedded • automation</div>
+        <div>focus: instruments • realtime • UX</div>
+      </div>
+    </aside>
+
+    <main>
+      <!-- Fixed console window at the beginning -->
+      <section id="console" class="panel term" aria-label="Interactive console">
+        <div class="term-head">
+          <span class="dot g"></span><span class="dot"></span><span class="dot"></span>
+          <span style="margin-left:8px;">/bin/azsh</span>
+        </div>
+        <div class="term-body">
+          <div id="console-output"></div>
+          <label class="row" style="display:flex; gap:8px; align-items:center; padding:8px 14px 14px; border-top:1px solid rgba(60,255,127,.15)">
+            <span class="prompt">$</span>
+            <input id="console-input" autocomplete="off" placeholder="type 'help' for commands…" style="flex:1; background:transparent; border:0; border-bottom:1px dashed var(--border); outline:none; color:#c7ffd6; padding:6px 4px; font-family:inherit"/>
+          </label>
+        </div>
+      </section>
+
+      <!-- Intro terminal -->
+      <section id="about" class="panel term" aria-label="Intro terminal">
+        <div class="term-head">
+          <span class="dot g"></span><span class="dot"></span><span class="dot"></span>
+          <span style="margin-left:8px;">aliakbar@portfolio:~</span>
+        </div>
+        <div class="term-body">
+          <p><span class="prompt">$</span> cat whoami.txt</p>
+          <p>Engineer fluent in embedded systems and modern .NET. I design robust desktop tooling for scientific/industrial setups, integrate firmware and devices, and ship clean operator UIs.</p>
+          <p class="meta">No commands needed—just click around.</p>
+          <p><span class="prompt">$</span> echo "open to collaborations"<span class="caret"></span></p>
+        </div>
+      </section>
+
+      <!-- Skills (indirect, technology-oriented) -->
+      <section id="skills">
+        <h2 class="section-title">skills</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Software</h3>
+            <div class="tags">
+              <span class="tag">C# / .NET</span>
+              <span class="tag">WPF / MVVM</span>
+              <span class="tag">LabVIEW</span>
+              <span class="tag">MATLAB</span>
+              <span class="tag">Bash</span>
+              <span class="tag">Git / GitHub / CI</span>
+              <span class="tag">Jira</span>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Embedded</h3>
+            <div class="tags">
+              <span class="tag">C / C++</span>
+              <span class="tag">Microcontrollers (Atmel, ESP, TI)</span>
+              <span class="tag">RTOS (QNX)</span>
+              <span class="tag">Serial (UART · I2C · SPI · CAN · USB)</span>
+              <span class="tag">FPGA (Altera)</span>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Hardware & Tools</h3>
+            <div class="tags">
+              <span class="tag">PCB (Altium · KiCAD · EasyEDA)</span>
+              <span class="tag">Sensors & Actuators</span>
+              <span class="tag">HMIs</span>
+              <span class="tag">Debugging & soldering</span>
+              <span class="tag">Test automation</span>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Domains</h3>
+            <div class="tags">
+              <span class="tag">Scientific/industrial instrumentation</span>
+              <span class="tag">Signal processing</span>
+              <span class="tag">Desktop tooling</span>
+              <span class="tag">Plugin architectures</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Projects (indirect references to plugins & tooling) -->
+      <section id="projects">
+        <h2 class="section-title">projects</h2>
+        <div class="grid-2" id="projectGrid"></div>
+      </section>
+
+      <!-- Experience -->
+      <section id="experience" class="panel">
+        <h2 class="section-title">experience</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Lead software & automation engineer (R&D)</h3>
+            <div class="meta">09/2024 – Present • Thun, Switzerland</div>
+            <p>Conception, design and verification of software for scientific/industrial applications; automation, signal acquisition & processing, and operator UIs in C#/.NET (WPF, MVVM). Cross-team collaboration and documentation.</p>
+          </div>
+          <div class="card">
+            <h3>Embedded system engineer</h3>
+            <div class="meta">03/2022 – 08/2023 • Geneva</div>
+            <p>Embedded software in C/C++ and LabVIEW, rapid prototyping and PCB work, documentation and risk assessments, debugging/repair of returned medical devices.</p>
+          </div>
+          <div class="card">
+            <h3>Test & system engineer</h3>
+            <div class="meta">10/2017 – 08/2021 • Bologna</div>
+            <p>GUI testing for software/hardware, code analysis in Java/C++, Bash scripting for automation, and formal reporting.</p>
+          </div>
+          <div class="card">
+            <h3>Embedded system engineer (intern)</h3>
+            <div class="meta">08/2017 • Bologna</div>
+            <p>Portable ventilator prototype: schematic & PCB design, embedded C++ for medical ventilators.</p>
+          </div>
+          <div class="card">
+            <h3>Team lead engineer</h3>
+            <div class="meta">2007 – 2012 • Tehran</div>
+            <p>Led installation and delivery of surveillance & security systems.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Highlights / Languages -->
+      <section id="highlights" class="panel">
+        <h2 class="section-title">highlights</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Automation boost</h3>
+            <p>Scripted creation of structured test evidence packages, cutting task time by ~85% and improving team throughput.</p>
+          </div>
+          <div class="card">
+            <h3>Cost-saving redesign</h3>
+            <p>Refactored a device’s HW/SW and re-implemented the interface in a more suitable language, saving ~5k CHF/year.</p>
+          </div>
+          <div class="card">
+            <h3>Rapid prototyping</h3>
+            <p>Built a prototype that reduced production cost by ~90% while satisfying sterilization constraints.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="languages" class="panel">
+        <h2 class="section-title">languages</h2>
+        <div class="grid-2">
+          <div class="card"><h3>Fluent</h3><div class="tags"><span class="tag">English</span><span class="tag">Italian</span></div></div>
+          <div class="card"><h3>Conversational</h3><div class="tags"><span class="tag">French</span></div></div>
+          <div class="card"><h3>Native</h3><div class="tags"><span class="tag">Persian</span></div></div>
+        </div>
+      </section>
+
+      <section id="contact" class="panel">
+        <h2 class="section-title">contact</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Get in touch</h3>
+            <p>↳ Email: <a href="mailto:aliakbar.rezapour@gmail.com">aliakbar.rezapour@gmail.com</a></p>
+            <p>↳ LinkedIn: <a href="#" id="liLink">linkedin.com/in/arezapour</a></p>
+          </div>
+          <div class="card">
+            <h3>Elsewhere</h3>
+            <p>CV (PDF) • Public talks • Demos — add links here later.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <div>© <span id="year"></span> Aliakbar Rezapour • Built with a Matrix-style terminal vibe (no typing required).</div>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // --- Matrix code rain ---
+    const canvas = document.getElementById('codeRain');
+    const ctx = canvas.getContext('2d');
+    const fontSize = 16;
+    function resize(){
+      canvas.width = innerWidth; canvas.height = innerHeight;
+      drops = new Array(Math.ceil(canvas.width / fontSize)).fill(1);
+    }
+    addEventListener('resize', resize); resize();
+
+    const chars = 'アイウエオカキクケコｱｲｳｴｵ01≈!=+/*<>[]{}#';
+    let drops = new Array(Math.ceil(canvas.width / fontSize)).fill(1);
+    let rainSpeed = 0.35; // slower matrix by default
+
+    function draw(){
+      ctx.fillStyle = 'rgba(0, 20, 0, 0.12)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = '#3CFF7F'; ctx.font = fontSize+'px monospace';
+      for(let i=0;i<drops.length;i++){
+        const text = chars[Math.floor(Math.random()*chars.length)];
+        ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+        if(drops[i]*fontSize > canvas.height && Math.random() > 0.985){ drops[i]=0; }
+        drops[i]+=rainSpeed;
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+
+    // --- Smooth anchors ---
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        const id = a.getAttribute('href').slice(1);
+        const target = document.getElementById(id);
+        if (target){ e.preventDefault(); target.scrollIntoView({behavior:'smooth'}); }
+      });
+    });
+
+    // --- Projects: indirect mentions (plugins, tooling, analysis) ---
+    const projects = [
+      {
+        title: 'Instrumentation Desktop Suite',
+        role: 'Lead dev • plugin-based architecture',
+        desc: 'Modular desktop tooling for running experiments, refining signals, and visualizing results. Device control, data pipelines, and operator-friendly UI.',
+        tags: ['.NET','WPF','MVVM','Signal','Plugins'],
+        link: '#'
+      },
+      {
+        title: 'Firmware ⇄ App Integration',
+        role: 'Embedded ↔ Desktop bridge',
+        desc: 'SCPI-style control and serial protocols to coordinate instruments with analysis modules and automated routines.',
+        tags: ['C/C++','C#','.NET','UART/I2C/SPI','USB'],
+        link: '#'
+      },
+      {
+        title: 'Release & Automation Toolkit',
+        role: 'Build, packaging, evidence',
+        desc: 'PowerShell utilities and CI flows to package apps, generate test evidence, and streamline reviews.',
+        tags: ['PowerShell','CI','Installers','Docs'],
+        link: '#'
+      },
+      {
+        title: 'Prototype Hardware & PCBs',
+        role: 'Rapid iterations',
+        desc: 'From schematic to firmware bring-up and verification for experimental devices and lab tools.',
+        tags: ['PCB','Sensors','FPGA','RTOS'],
+        link: '#'
+      }
+    ];
+
+    const grid = document.getElementById('projectGrid');
+    projects.forEach(p => {
+      const el = document.createElement('article');
+      el.className = 'card';
+      el.innerHTML = `
+        <h3>${p.title}</h3>
+        <div class="meta">${p.role}</div>
+        <p>${p.desc}</p>
+        <div class="tags">${p.tags.map(t=>`<span class='tag'>${t}</span>`).join('')}</div>
+        <p style="margin-top:8px"><a href="${p.link}">learn more →</a></p>
+      `;
+      grid.appendChild(el);
+    });
+
+    // footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // --- Simple bash-like console ---
+    const out = document.getElementById('console-output');
+    const inp = document.getElementById('console-input');
+    if(out && inp){
+      const sections = ['about','skills','projects','experience','highlights','languages','contact'];
+      const links = { cv:'#', linkedin:'#', email:'mailto:aliakbar.rezapour@gmail.com' };
+
+      const commands = {
+        help(){ return `Available commands:
+  help              show this help
+  whoami            short bio
+  ls                list sections
+  goto <section>    scroll to section (e.g. goto projects)
+  skills            list core skills
+  projects          list project names
+  contact           show contact links
+  cv                show CV link
+  matrix [on|off]   toggle code rain
+  speed <0.1-2>     set matrix speed
+  clear             clear console`; },
+        whoami(){ return 'Engineer across embedded + .NET desktop; builds instrumentation tooling and clean operator UIs.'; },
+        ls(){ return sections.join('  '); },
+        goto(arg){
+          const id = String(arg||'').toLowerCase();
+          const el = document.getElementById(id);
+          if(!el) return `section not found: ${id}`;
+          el.scrollIntoView({behavior:'smooth'}); return `→ scrolled to ${id}`;
+        },
+        skills(){ return 'C#/.NET · WPF/MVVM · C/C++ · RTOS · Protocols (UART/I2C/SPI/CAN/USB) · Signal processing · CI/Automation'; },
+        projects(){ return ['Instrumentation Desktop Suite','Firmware ⇄ App Integration','Release & Automation Toolkit','Prototype Hardware & PCBs'].map(x=>`- ${x}`).join('\n'); },
+        contact(){ return `email: ${links.email}\nlinkedin: ${links.linkedin}`; },
+        cv(){ return links.cv === '#' ? 'CV link: (add your PDF url in code → links.cv)' : `opening: ${links.cv}`; },
+        matrix(arg){ const on = (String(arg||'').toLowerCase() !== 'off'); canvas.style.display = on ? 'block' : 'none'; return `matrix ${on?'on':'off'}`; },
+        speed(val){ const n = parseFloat(val); if(isNaN(n) || n<=0) return 'usage: speed <0.1-2>'; rainSpeed = Math.max(0.1, Math.min(2, n)); return `matrix speed = ${rainSpeed}`; },
+        clear(){ out.textContent=''; return ''; }
+      };
+
+      function print(text){ out.textContent += (text ? text + "\n" : ''); out.scrollTop = out.scrollHeight; }
+      print("Type 'help' for commands. Example: goto projects\n\n" + commands.help());
+
+      inp.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter'){
+          const line = inp.value.trim(); inp.value='';
+          if(!line){ return; }
+          const [cmd, ...args] = line.split(/\s+/);
+          const fn = commands[cmd];
+          print('$ ' + line);
+          if(fn){
+            const res = fn(args.join(' '));
+            if(res) print(res);
+          } else {
+            print(`command not found: ${cmd}`);
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
