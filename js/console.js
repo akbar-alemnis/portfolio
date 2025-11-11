@@ -26,7 +26,7 @@
       description: 'Display biography',
       action: () => [
         { type: 'system', text: 'BIO:' },
-        { type: 'standard', text: 'Full-stack developer with a love for synthwave palettes, .NET tooling, and immersive UI.' }
+        { type: 'standard', text: 'Front-end developer with a love for synthwave palettes, creative coding, and immersive UI.' }
       ]
     },
     projects: {
@@ -34,8 +34,8 @@
       action: () => [
         { type: 'system', text: 'ACTIVE MISSIONS:' },
         { type: 'standard', text: '1. Synthwave Dashboard — Real-time telemetry interface.' },
-        { type: 'standard', text: '2. Temporal Explorer — Blazor WebAssembly narrative.' },
-        { type: 'standard', text: '3. Neon Narrative Engine — C# interactive fiction system.' }
+        { type: 'standard', text: '2. Temporal Explorer — Progressive Web App narrative.' },
+        { type: 'standard', text: '3. Neon Narrative Engine — JavaScript-powered interactive fiction system.' }
       ]
     },
     contact: {
