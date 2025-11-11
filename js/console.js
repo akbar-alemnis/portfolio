@@ -15,35 +15,69 @@
         return [
           { type: 'system', text: 'AVAILABLE COMMANDS:' },
           { type: 'standard', text: "help - Display available commands" },
-          { type: 'standard', text: "about - Learn more about the pilot" },
-          { type: 'standard', text: "projects - Showcase of deployed missions" },
-          { type: 'standard', text: "contact - Transmission protocols" },
+          { type: 'standard', text: "summary - Career overview" },
+          { type: 'standard', text: "experience - Recent roles" },
+          { type: 'standard', text: "skills - Technical focus areas" },
+          { type: 'standard', text: "achievements - Highlights worth celebrating" },
+          { type: 'standard', text: "contact - Reach Aliakbar" },
           { type: 'standard', text: "clear - Purge command history" }
         ];
       }
     },
-    about: {
-      description: 'Display biography',
+    summary: {
+      description: 'Display summary',
       action: () => [
-        { type: 'system', text: 'BIO:' },
-        { type: 'standard', text: 'Front-end developer with a love for synthwave palettes, creative coding, and immersive UI.' }
+        { type: 'system', text: 'CAREER SUMMARY:' },
+        {
+          type: 'standard',
+          text: 'Lead Software & Automation Engineer delivering reliable scientific and industrial instrumentation through clean design, embedded expertise, and collaborative workflows.'
+        }
       ]
     },
-    projects: {
-      description: 'Display project list',
+    experience: {
+      description: 'Display key experience',
       action: () => [
-        { type: 'system', text: 'ACTIVE MISSIONS:' },
-        { type: 'standard', text: '1. Synthwave Dashboard — Real-time telemetry interface.' },
-        { type: 'standard', text: '2. Temporal Explorer — Progressive Web App narrative.' },
-        { type: 'standard', text: '3. Neon Narrative Engine — JavaScript-powered interactive fiction system.' }
+        { type: 'system', text: 'RECENT ROLES:' },
+        {
+          type: 'standard',
+          text: 'Alemnis AG (2024–Present) — Leading software conception, automation, and CI/CD for advanced instruments.'
+        },
+        {
+          type: 'standard',
+          text: 'Forimtech SA (2022–2023) — Built medical firmware, PCB prototypes, and documentation in regulated settings.'
+        },
+        {
+          type: 'standard',
+          text: 'GLI Italy B.V. (2017–2021) — Delivered hardware/software testing, code analysis, and QA automation.'
+        }
+      ]
+    },
+    skills: {
+      description: 'Display technical skills',
+      action: () => [
+        { type: 'system', text: 'TECHNICAL FOCUS:' },
+        { type: 'standard', text: 'Programming — C#, C/C++, LabVIEW, MATLAB, Bash.' },
+        { type: 'standard', text: 'Hardware — Microcontrollers, FPGA (Altera), PCB design with Altium/KiCAD/EasyEDA.' },
+        { type: 'standard', text: 'Tools & Systems — Git/GitHub, JIRA, Podio, ClickUp, RTOS (QNX), Windows, Linux.' },
+        { type: 'standard', text: 'Specialties — Sensors, serial protocols, motors, HMI design.' }
+      ]
+    },
+    achievements: {
+      description: 'Display achievements',
+      action: () => [
+        { type: 'system', text: 'NOTABLE ACHIEVEMENTS:' },
+        { type: 'standard', text: 'Automated test evidence workflows, cutting documentation time by 85%.' },
+        { type: 'standard', text: 'Redesigned medical firmware with open-source tools, saving CHF 5 000 annually.' },
+        { type: 'standard', text: 'Prototyped cost-efficient hardware reducing production cost by 90%.' }
       ]
     },
     contact: {
       description: 'Display contact info',
       action: () => [
         { type: 'system', text: 'CONTACT CHANNELS:' },
-        { type: 'standard', text: 'Email: you@example.com' },
-        { type: 'standard', text: 'LinkedIn: linkedin.com/in/yourprofile' }
+        { type: 'standard', text: 'Email: aliakbar.rezapour@outlook.com' },
+        { type: 'standard', text: 'Phone: +41 78 213 9524' },
+        { type: 'standard', text: 'LinkedIn: linkedin.com/in/arezapour' }
       ]
     },
     clear: {
