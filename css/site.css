@@ -93,9 +93,32 @@ body {
 
 .hero__subtitle {
   margin: 0 auto 2rem;
-  max-width: 620px;
+  max-width: 720px;
   color: var(--text-muted);
-  line-height: 1.6;
+  line-height: 1.7;
+}
+
+.hero__meta {
+  margin: 0 auto 2rem;
+  max-width: 720px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  justify-content: center;
+  font-size: 0.95rem;
+}
+
+.hero__meta span,
+.hero__meta a {
+  color: var(--text-muted);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(78, 241, 242, 0.3);
+  padding-bottom: 0.2rem;
+}
+
+.hero__meta a:hover {
+  color: var(--accent-cyan);
+  border-color: rgba(255, 94, 246, 0.6);
 }
 
 .hero__cta {
@@ -148,7 +171,7 @@ body {
 }
 
 .panel__title {
-  margin: 0 0 1rem;
+  margin: 0 0 1.25rem;
   font-family: var(--font-display);
   font-size: 1.25rem;
   letter-spacing: 0.15em;
@@ -160,59 +183,156 @@ body {
   color: var(--text-muted);
 }
 
-.projects {
+.panel__list {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: grid;
+  gap: 0.75rem;
+  color: var(--text-muted);
+}
+
+.panel__list li {
+  position: relative;
+}
+
+.panel__list li::marker {
+  color: var(--accent-cyan);
+}
+
+.experience-grid {
   display: grid;
   gap: 1.5rem;
 }
 
-.project {
-  padding: 1.5rem;
-  border: 1px solid rgba(78, 241, 242, 0.2);
+.experience {
+  padding: 1.75rem;
+  border: 1px solid rgba(78, 241, 242, 0.25);
   background: rgba(5, 2, 18, 0.6);
   position: relative;
   overflow: hidden;
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
-.project::after {
+.experience::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(78, 241, 242, 0.1), rgba(255, 94, 246, 0.05));
+  background: linear-gradient(135deg, rgba(78, 241, 242, 0.1), rgba(255, 94, 246, 0.08));
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
 }
 
-.project:hover {
+.experience:hover {
   transform: translateY(-4px);
-  border-color: rgba(255, 94, 246, 0.5);
+  border-color: rgba(255, 94, 246, 0.45);
 }
 
-.project:hover::after {
+.experience:hover::after {
   opacity: 1;
 }
 
-.project__title {
+.experience__header {
+  margin-bottom: 1rem;
+}
+
+.experience__role {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display);
+  letter-spacing: 0.1em;
+  font-size: 1.1rem;
+}
+
+.experience__company {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.experience__points {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: grid;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.experience__points li::marker {
+  color: var(--accent-yellow);
+}
+
+.skills-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.skills-group {
+  padding: 1.25rem 1.5rem;
+  border: 1px solid rgba(255, 94, 246, 0.25);
+  background: rgba(8, 2, 25, 0.6);
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.skills-group:hover {
+  border-color: rgba(78, 241, 242, 0.5);
+  transform: translateY(-3px);
+}
+
+.skills-group__title {
   margin: 0 0 0.5rem;
   font-family: var(--font-display);
   letter-spacing: 0.1em;
 }
 
-.project__description {
-  margin: 0 0 1rem;
+.skills-group__body {
+  margin: 0;
   color: var(--text-muted);
+  line-height: 1.6;
 }
 
-.project__link {
-  color: var(--accent-yellow);
-  text-decoration: none;
-  font-weight: 500;
+.education-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.education {
+  padding: 1.25rem 1.5rem;
+  border: 1px solid rgba(78, 241, 242, 0.25);
+  background: rgba(5, 2, 18, 0.6);
+}
+
+.education__degree {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display);
   letter-spacing: 0.08em;
 }
 
-.project__link:hover {
-  text-decoration: underline;
+.education__meta {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.languages-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.languages {
+  padding: 1.25rem 1.5rem;
+  border: 1px solid rgba(255, 94, 246, 0.25);
+  background: rgba(8, 2, 25, 0.6);
+}
+
+.languages__title {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+}
+
+.languages__body {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.6;
 }
 
 .console {
@@ -363,7 +483,8 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.4;
   }
   50% {
@@ -372,8 +493,17 @@ body {
 }
 
 @media (min-width: 768px) {
-  .projects {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .experience-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .skills-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .education-grid,
+  .languages-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
