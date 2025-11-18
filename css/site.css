@@ -390,6 +390,18 @@ body {
   color: var(--accent-yellow);
 }
 
+.console__line--art {
+  color: #2aff2a;
+  text-shadow: 0 0 12px rgba(42, 255, 42, 0.4);
+}
+
+.console__line--art pre {
+  margin: 0;
+  font-family: var(--font-mono);
+  white-space: pre;
+  letter-spacing: 0.08em;
+}
+
 .console__form {
   display: flex;
   align-items: center;
@@ -429,6 +441,15 @@ body {
   display: inline-block;
   animation: pulse 1.5s infinite;
   color: var(--accent-magenta);
+}
+
+.matrix-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  mix-blend-mode: screen;
+  opacity: 0.65;
 }
 
 .glitch {
