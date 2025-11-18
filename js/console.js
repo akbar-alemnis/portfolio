@@ -13,6 +13,7 @@
   const musicFolder = 'music/';
   const musicTracks = [
     // Add your mp3 filenames here, e.g. 'track1.mp3', 'track2.mp3'
+    'futuristic-synthwave-track-227035.mp3', 'retro-lounge-389644.mp3', 'retro-vibes-402459.mp3', 'tense-neo-noir-437990.mp3'
   ];
 
   const motdMessages = [
