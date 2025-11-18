@@ -10,6 +10,7 @@
 
   const startTime = Date.now();
   const audioPlayer = new Audio();
+  audioPlayer.preload = 'auto';
   const musicFolder = 'music/';
   const musicTracks = [
     // Add your mp3 filenames here, e.g. 'track1.mp3', 'track2.mp3'
@@ -57,6 +58,22 @@
   let matrixInterval;
   let matrixDrops = [];
   let matrixResizeHandler;
+
+  audioPlayer.addEventListener('error', () => {
+    console.error('[PLAY] Media error code:', audioPlayer.error && audioPlayer.error.code);
+  });
+
+  audioPlayer.addEventListener('canplay', () => {
+    console.log('[PLAY] canplay fired');
+  });
+
+  audioPlayer.addEventListener('canplaythrough', () => {
+    console.log('[PLAY] canplaythrough fired');
+  });
+
+  audioPlayer.addEventListener('play', () => {
+    console.log('[PLAY] play event fired, currentTime:', audioPlayer.currentTime);
+  });
 
   const commands = {
     help: {
@@ -168,38 +185,29 @@
         return [{ type: 'system', text: 'Matrix stream engaged. Press "matrix" again to stop.' }];
       }
     },
-play: {
-  description: 'Play a random track from /music',
-  action: () => {
-    if (!musicTracks.length) {
-      return [{ type: 'warning', text: 'No tracks found.' }];
-    }
-    const choice = musicTracks[Math.floor(Math.random() * musicTracks.length)];
-    const src = musicFolder + choice;
-    console.log('[PLAY] Selected', choice, '->', src);
-    audioPlayer.src = src;
-    audioPlayer.loop = false;
+    play: {
+      description: 'Play a random track from /music',
+      action: () => {
+        if (!musicTracks.length) {
+          return [{ type: 'warning', text: 'No tracks found.' }];
+        }
 
-    audioPlayer.addEventListener('error', () => {
-      console.error('[PLAY] Media error code:', audioPlayer.error && audioPlayer.error.code);
-    });
-    audioPlayer.addEventListener('canplay', () => {
-      console.log('[PLAY] canplay fired');
-    });
-    audioPlayer.addEventListener('canplaythrough', () => {
-      console.log('[PLAY] canplaythrough fired');
-    });
-    audioPlayer.addEventListener('play', () => {
-      console.log('[PLAY] play event fired, currentTime:', audioPlayer.currentTime);
-    });
+        const choice = musicTracks[Math.floor(Math.random() * musicTracks.length)];
+        const src = `${musicFolder}${choice}`;
+        console.log('[PLAY] Selected', choice, '->', src);
 
-    audioPlayer.play()
-      .then(() => console.log('[PLAY] Playback started'))
-      .catch(err => console.error('[PLAY] play() rejected:', err));
+        if (audioPlayer.src !== src) {
+          audioPlayer.src = src;
+        }
+        audioPlayer.loop = false;
 
-    return [{ type: 'system', text: `Now playing: ${choice}` }];
-    }
-  }
+        audioPlayer
+          .play()
+          .then(() => console.log('[PLAY] Playback started'))
+          .catch((err) => console.error('[PLAY] play() rejected:', err));
+
+        return [{ type: 'system', text: `Now playing: ${choice}` }];
+      }
     },
     stop: {
       description: 'Stop the song',
