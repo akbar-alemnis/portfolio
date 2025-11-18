@@ -168,23 +168,38 @@
         return [{ type: 'system', text: 'Matrix stream engaged. Press "matrix" again to stop.' }];
       }
     },
-    play: {
-      description: 'Play a random track from /music',
-      action: () => {
-        if (!musicTracks.length) {
-          return [
-            {
-              type: 'warning',
-              text: 'No tracks found. Add mp3 files to /music and update musicTracks in console.js.'
-            }
-          ];
-        }
-        const choice = musicTracks[Math.floor(Math.random() * musicTracks.length)];
-        audioPlayer.src = `${musicFolder}${choice}`;
-        audioPlayer.loop = false;
-        audioPlayer.play().catch(() => {});
-        return [{ type: 'system', text: `Now playing: ${choice}` }];
-      }
+play: {
+  description: 'Play a random track from /music',
+  action: () => {
+    if (!musicTracks.length) {
+      return [{ type: 'warning', text: 'No tracks found.' }];
+    }
+    const choice = musicTracks[Math.floor(Math.random() * musicTracks.length)];
+    const src = musicFolder + choice;
+    console.log('[PLAY] Selected', choice, '->', src);
+    audioPlayer.src = src;
+    audioPlayer.loop = false;
+
+    audioPlayer.addEventListener('error', () => {
+      console.error('[PLAY] Media error code:', audioPlayer.error && audioPlayer.error.code);
+    });
+    audioPlayer.addEventListener('canplay', () => {
+      console.log('[PLAY] canplay fired');
+    });
+    audioPlayer.addEventListener('canplaythrough', () => {
+      console.log('[PLAY] canplaythrough fired');
+    });
+    audioPlayer.addEventListener('play', () => {
+      console.log('[PLAY] play event fired, currentTime:', audioPlayer.currentTime);
+    });
+
+    audioPlayer.play()
+      .then(() => console.log('[PLAY] Playback started'))
+      .catch(err => console.error('[PLAY] play() rejected:', err));
+
+    return [{ type: 'system', text: `Now playing: ${choice}` }];
+    }
+  }
     },
     stop: {
       description: 'Stop the song',
