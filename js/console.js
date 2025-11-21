@@ -3,6 +3,9 @@
   const consoleForm = document.querySelector('.console__form');
   const input = document.getElementById('console-input');
   const yearEl = document.getElementById('year');
+  const instagramPanel = document.getElementById('instagram-panel');
+  const instagramFrame = document.getElementById('instagram-embed');
+  const instagramClose = document.getElementById('instagram-close');
 
   if (!consoleOutput || !consoleForm || !input) {
     return;
@@ -100,6 +103,7 @@
           { type: 'standard', text: "ascii art - Render the Matrix-flavored logo" },
           { type: 'standard', text: "matrix - Toggle falling green characters" },
           { type: 'standard', text: "play - Play a random track from /music" },
+          { type: 'standard', text: "instagram - Toggle @akilius_ feed on the right" },
           { type: 'standard', text: "stop - Stop the current track" }
         ];
       }
@@ -189,6 +193,10 @@
         startMatrix();
         return [{ type: 'system', text: 'Matrix stream engaged. Press "matrix" again to stop.' }];
       }
+    },
+    instagram: {
+      description: 'Toggle Instagram feed',
+      action: () => toggleInstagramPanel()
     },
     play: {
       description: 'Play a random track from /music',
@@ -351,5 +359,33 @@
 
   if (yearEl) {
     yearEl.textContent = new Date().getFullYear().toString();
+  }
+
+  const toggleInstagramPanel = () => {
+    if (!instagramPanel) {
+      return [{ type: 'warning', text: 'Instagram panel unavailable.' }];
+    }
+
+    const isActive = instagramPanel.classList.toggle('side-panel--active');
+    instagramPanel.setAttribute('aria-hidden', String(!isActive));
+
+    if (isActive && instagramFrame && !instagramFrame.src) {
+      instagramFrame.src = instagramFrame.dataset.src;
+    }
+
+    if (!isActive) {
+      return [{ type: 'system', text: 'Instagram feed retracted. Command deck standing by.' }];
+    }
+
+    return [{ type: 'system', text: 'Instagram feed docked on the right. Type "instagram" again to hide.' }];
+  };
+
+  if (instagramClose) {
+    instagramClose.addEventListener('click', () => {
+      if (instagramPanel && instagramPanel.classList.contains('side-panel--active')) {
+        instagramPanel.classList.remove('side-panel--active');
+        instagramPanel.setAttribute('aria-hidden', 'true');
+      }
+    });
   }
 })();
