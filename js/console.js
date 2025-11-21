@@ -19,7 +19,6 @@
   audioPlayer.preload = 'auto';
   const musicFolder = 'music/';
   const musicTracks = [
-    // Add your mp3 filenames here, e.g. 'track1.mp3', 'track2.mp3'
     'futuristic-synthwave-track-227035.mp3', 'retro-lounge-389644.mp3', 'retro-vibes-402459.mp3', 'tense-neo-noir-437990.mp3', '8-bit-game-158815.mp3'
   ];
 
@@ -104,9 +103,9 @@
           { type: 'standard', text: "motd - Message of the day" },
           { type: 'standard', text: "fortune - Random quote" },
           { type: 'standard', text: "ascii art - Render the Matrix-flavored logo" },
-          { type: 'standard', text: "matrix - Toggle falling green characters" },
+          { type: 'standard', text: "instagram - Dance photo gallery" },
+          { type: 'standard', text: "matrix - Enter the matrix" },
           { type: 'standard', text: "play - Play a random track from /music" },
-          { type: 'standard', text: "instagram - Toggle @akilius_ dance gallery on the right" },
           { type: 'standard', text: "stop - Stop the current track" }
         ];
       }
@@ -392,6 +391,11 @@
       tile.style.backgroundImage = `url(${photo})`;
       tile.setAttribute('role', 'img');
       tile.setAttribute('aria-label', 'Dance photo from @akilius_');
+      // open clicked image in a fullscreen lightbox
+      tile.addEventListener('click', () => {
+        openLightbox(photo);
+      });
+
       instagramGallery.appendChild(tile);
     });
 
@@ -399,6 +403,84 @@
       instagramFallback.classList.remove('is-visible');
     }
   };
+
+  // Lightbox implementation (background-frame approach to discourage saving)
+  let lightboxEl = null;
+
+  const createLightbox = () => {
+    if (lightboxEl) return lightboxEl;
+
+    lightboxEl = document.createElement('div');
+    lightboxEl.className = 'lightbox';
+    lightboxEl.setAttribute('role', 'dialog');
+    lightboxEl.setAttribute('aria-modal', 'true');
+    lightboxEl.tabIndex = -1;
+
+    const frame = document.createElement('div');
+    frame.className = 'lightbox__frame';
+    frame.setAttribute('role', 'img');
+    frame.setAttribute('aria-label', 'Dance photo fullscreen preview');
+
+    // prevent right-click and dragging to discourage saving
+    frame.addEventListener('contextmenu', (e) => e.preventDefault());
+    frame.addEventListener('dragstart', (e) => e.preventDefault());
+
+    const closeBtn = document.createElement('button');
+    // reuse sidebar close styles so it looks identical
+    closeBtn.className = 'side-panel__close lightbox__close';
+    closeBtn.type = 'button';
+    closeBtn.setAttribute('aria-label', 'Close image');
+    closeBtn.innerHTML = '✕';
+
+    closeBtn.addEventListener('click', closeLightbox);
+
+    // clicking backdrop closes unless clicking the frame itself
+    lightboxEl.addEventListener('click', (ev) => {
+      if (ev.target === lightboxEl) {
+        closeLightbox();
+      }
+    });
+
+    // clicking inside frame should not close
+    frame.addEventListener('click', (ev) => ev.stopPropagation());
+
+    lightboxEl.appendChild(frame);
+    lightboxEl.appendChild(closeBtn);
+    document.body.appendChild(lightboxEl);
+
+    // prevent right-click on the overlay too
+    lightboxEl.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    return lightboxEl;
+  };
+
+  const openLightbox = (src) => {
+    const lb = createLightbox();
+    const frame = lb.querySelector('.lightbox__frame');
+    frame.style.backgroundImage = `url(${src})`;
+    // show with animation
+    window.requestAnimationFrame(() => lb.classList.add('is-visible'));
+    document.body.style.overflow = 'hidden';
+    lb.focus && lb.focus();
+  };
+
+  const closeLightbox = () => {
+    if (!lightboxEl) return;
+    lightboxEl.classList.remove('is-visible');
+    document.body.style.overflow = '';
+    // clear background after animation to release memory
+    setTimeout(() => {
+      const frame = lightboxEl.querySelector('.lightbox__frame');
+      if (frame) frame.style.backgroundImage = '';
+    }, 360);
+  };
+
+  // Close on ESC key
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') {
+      closeLightbox();
+    }
+  });
 
   const normalizePhotos = (data) => {
     if (Array.isArray(data)) {
