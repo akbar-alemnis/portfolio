@@ -188,23 +188,15 @@
     </div>
     <div class="side-panel__body">
       <div class="side-panel__viewport">
-        <iframe
-          id="instagram-embed"
-          title="Instagram feed for @akilius_"
-          src=""
-          data-src="https://www.instagram.com/akilius_/embed/"
-          loading="lazy"
-          referrerpolicy="no-referrer"
-          allowfullscreen
-        ></iframe>
+        <div class="side-panel__gallery" id="instagram-gallery" aria-live="polite"></div>
         <div class="side-panel__fallback" id="instagram-fallback" aria-live="polite">
-          <p class="side-panel__fallback-title">Instagram is feeling camera-shy.</p>
-          <p class="side-panel__fallback-copy">Open the feed in a fresh tab to see @akilius_ in action.</p>
+          <p class="side-panel__fallback-title" id="instagram-fallback-title">Loading dance snaps…</p>
+          <p class="side-panel__fallback-copy" id="instagram-fallback-copy">Add your photos to /dance-photos/ and they will appear here.</p>
           <a class="side-panel__link" href="https://www.instagram.com/akilius_" target="_blank" rel="noopener">instagram.com/akilius_</a>
         </div>
       </div>
       <div class="side-panel__footer">
-        <p class="side-panel__note">If the embed is shy, open the feed in a fresh tab:</p>
+        <p class="side-panel__note">If you prefer, open the feed in a fresh tab:</p>
         <a class="side-panel__link" href="https://www.instagram.com/akilius_" target="_blank" rel="noopener">instagram.com/akilius_</a>
       </div>
     </div>

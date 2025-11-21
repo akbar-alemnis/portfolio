@@ -4,9 +4,11 @@
   const input = document.getElementById('console-input');
   const yearEl = document.getElementById('year');
   const instagramPanel = document.getElementById('instagram-panel');
-  const instagramFrame = document.getElementById('instagram-embed');
   const instagramClose = document.getElementById('instagram-close');
   const instagramFallback = document.getElementById('instagram-fallback');
+  const instagramFallbackTitle = document.getElementById('instagram-fallback-title');
+  const instagramFallbackCopy = document.getElementById('instagram-fallback-copy');
+  const instagramGallery = document.getElementById('instagram-gallery');
 
   if (!consoleOutput || !consoleForm || !input) {
     return;
@@ -104,7 +106,7 @@
           { type: 'standard', text: "ascii art - Render the Matrix-flavored logo" },
           { type: 'standard', text: "matrix - Toggle falling green characters" },
           { type: 'standard', text: "play - Play a random track from /music" },
-          { type: 'standard', text: "instagram - Toggle @akilius_ feed on the right" },
+          { type: 'standard', text: "instagram - Toggle @akilius_ dance gallery on the right" },
           { type: 'standard', text: "stop - Stop the current track" }
         ];
       }
@@ -362,7 +364,81 @@
     yearEl.textContent = new Date().getFullYear().toString();
   }
 
-  let instagramFallbackTimer;
+  const photoManifestUrl = 'dance-photos/manifest.json';
+  let galleryLoaded = false;
+
+  const setGalleryStatus = (title, copy, shouldShow = true) => {
+    if (instagramFallbackTitle) {
+      instagramFallbackTitle.textContent = title;
+    }
+    if (instagramFallbackCopy) {
+      instagramFallbackCopy.textContent = copy;
+    }
+    if (instagramFallback) {
+      instagramFallback.classList.toggle('is-visible', shouldShow);
+    }
+  };
+
+  const renderGallery = (photos) => {
+    if (!instagramGallery) {
+      return;
+    }
+
+    instagramGallery.innerHTML = '';
+
+    photos.forEach((photo) => {
+      const tile = document.createElement('div');
+      tile.className = 'side-panel__tile';
+      tile.style.backgroundImage = `url(${photo})`;
+      tile.setAttribute('role', 'img');
+      tile.setAttribute('aria-label', 'Dance photo from @akilius_');
+      instagramGallery.appendChild(tile);
+    });
+
+    if (instagramFallback) {
+      instagramFallback.classList.remove('is-visible');
+    }
+  };
+
+  const normalizePhotos = (data) => {
+    if (Array.isArray(data)) {
+      return data;
+    }
+    if (data && Array.isArray(data.photos)) {
+      return data.photos;
+    }
+    return [];
+  };
+
+  const loadLocalGallery = () => {
+    if (galleryLoaded || !instagramGallery) {
+      return;
+    }
+
+    setGalleryStatus('Loading dance snaps…', 'Fetching the local gallery. Add photos into /dance-photos/ to feature them here.', true);
+
+    fetch(photoManifestUrl, { cache: 'no-store' })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Manifest not found');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        const photos = normalizePhotos(data).filter(Boolean);
+
+        if (!photos.length) {
+          setGalleryStatus('Gallery warming up', 'Drop .jpg or .png files into /dance-photos/ and list them in manifest.json.', true);
+          return;
+        }
+
+        renderGallery(photos.map((name) => `${photoManifestUrl.replace('manifest.json', '')}${name}`));
+        galleryLoaded = true;
+      })
+      .catch(() => {
+        setGalleryStatus('Gallery offline', 'Could not load /dance-photos/manifest.json. Add your files and refresh to showcase them.', true);
+      });
+  };
 
   const toggleInstagramPanel = () => {
     if (!instagramPanel) {
@@ -372,30 +448,15 @@
     const isActive = instagramPanel.classList.toggle('side-panel--active');
     instagramPanel.setAttribute('aria-hidden', String(!isActive));
 
-    if (instagramFallback) {
-      instagramFallback.classList.remove('is-visible');
-    }
-
-    if (instagramFallbackTimer) {
-      window.clearTimeout(instagramFallbackTimer);
-      instagramFallbackTimer = null;
-    }
-
-    if (isActive && instagramFrame && !instagramFrame.src) {
-      instagramFrame.src = instagramFrame.dataset.src;
-
-      instagramFallbackTimer = window.setTimeout(() => {
-        if (instagramFallback && !instagramFrame.dataset.loaded) {
-          instagramFallback.classList.add('is-visible');
-        }
-      }, 2500);
+    if (isActive) {
+      loadLocalGallery();
     }
 
     if (!isActive) {
-      return [{ type: 'system', text: 'Instagram feed retracted. Command deck standing by.' }];
+      return [{ type: 'system', text: 'Instagram gallery retracted. Command deck standing by.' }];
     }
 
-    return [{ type: 'system', text: 'Instagram feed docked on the right. Type "instagram" again to hide.' }];
+    return [{ type: 'system', text: 'Instagram-inspired gallery docked on the right. Type "instagram" again to hide.' }];
   };
 
   if (instagramClose) {
@@ -403,28 +464,6 @@
       if (instagramPanel && instagramPanel.classList.contains('side-panel--active')) {
         instagramPanel.classList.remove('side-panel--active');
         instagramPanel.setAttribute('aria-hidden', 'true');
-
-        if (instagramFallbackTimer) {
-          window.clearTimeout(instagramFallbackTimer);
-          instagramFallbackTimer = null;
-        }
-
-        if (instagramFallback) {
-          instagramFallback.classList.remove('is-visible');
-        }
-      }
-    });
-  }
-
-  if (instagramFrame) {
-    instagramFrame.addEventListener('load', () => {
-      instagramFrame.dataset.loaded = 'true';
-      if (instagramFallback) {
-        instagramFallback.classList.remove('is-visible');
-      }
-      if (instagramFallbackTimer) {
-        window.clearTimeout(instagramFallbackTimer);
-        instagramFallbackTimer = null;
       }
     });
   }
