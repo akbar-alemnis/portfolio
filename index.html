@@ -187,15 +187,22 @@
       <button class="side-panel__close" id="instagram-close" type="button" aria-label="Close Instagram feed">✕</button>
     </div>
     <div class="side-panel__body">
-      <iframe
-        id="instagram-embed"
-        title="Instagram feed for @akilius_"
-        src=""
-        data-src="https://www.instagram.com/akilius_/embed"
-        loading="lazy"
-        referrerpolicy="no-referrer"
-        allowfullscreen
-      ></iframe>
+      <div class="side-panel__viewport">
+        <iframe
+          id="instagram-embed"
+          title="Instagram feed for @akilius_"
+          src=""
+          data-src="https://www.instagram.com/akilius_/embed/"
+          loading="lazy"
+          referrerpolicy="no-referrer"
+          allowfullscreen
+        ></iframe>
+        <div class="side-panel__fallback" id="instagram-fallback" aria-live="polite">
+          <p class="side-panel__fallback-title">Instagram is feeling camera-shy.</p>
+          <p class="side-panel__fallback-copy">Open the feed in a fresh tab to see @akilius_ in action.</p>
+          <a class="side-panel__link" href="https://www.instagram.com/akilius_" target="_blank" rel="noopener">instagram.com/akilius_</a>
+        </div>
+      </div>
       <div class="side-panel__footer">
         <p class="side-panel__note">If the embed is shy, open the feed in a fresh tab:</p>
         <a class="side-panel__link" href="https://www.instagram.com/akilius_" target="_blank" rel="noopener">instagram.com/akilius_</a>

@@ -6,6 +6,7 @@
   const instagramPanel = document.getElementById('instagram-panel');
   const instagramFrame = document.getElementById('instagram-embed');
   const instagramClose = document.getElementById('instagram-close');
+  const instagramFallback = document.getElementById('instagram-fallback');
 
   if (!consoleOutput || !consoleForm || !input) {
     return;
@@ -361,6 +362,8 @@
     yearEl.textContent = new Date().getFullYear().toString();
   }
 
+  let instagramFallbackTimer;
+
   const toggleInstagramPanel = () => {
     if (!instagramPanel) {
       return [{ type: 'warning', text: 'Instagram panel unavailable.' }];
@@ -369,8 +372,23 @@
     const isActive = instagramPanel.classList.toggle('side-panel--active');
     instagramPanel.setAttribute('aria-hidden', String(!isActive));
 
+    if (instagramFallback) {
+      instagramFallback.classList.remove('is-visible');
+    }
+
+    if (instagramFallbackTimer) {
+      window.clearTimeout(instagramFallbackTimer);
+      instagramFallbackTimer = null;
+    }
+
     if (isActive && instagramFrame && !instagramFrame.src) {
       instagramFrame.src = instagramFrame.dataset.src;
+
+      instagramFallbackTimer = window.setTimeout(() => {
+        if (instagramFallback && !instagramFrame.dataset.loaded) {
+          instagramFallback.classList.add('is-visible');
+        }
+      }, 2500);
     }
 
     if (!isActive) {
@@ -385,6 +403,28 @@
       if (instagramPanel && instagramPanel.classList.contains('side-panel--active')) {
         instagramPanel.classList.remove('side-panel--active');
         instagramPanel.setAttribute('aria-hidden', 'true');
+
+        if (instagramFallbackTimer) {
+          window.clearTimeout(instagramFallbackTimer);
+          instagramFallbackTimer = null;
+        }
+
+        if (instagramFallback) {
+          instagramFallback.classList.remove('is-visible');
+        }
+      }
+    });
+  }
+
+  if (instagramFrame) {
+    instagramFrame.addEventListener('load', () => {
+      instagramFrame.dataset.loaded = 'true';
+      if (instagramFallback) {
+        instagramFallback.classList.remove('is-visible');
+      }
+      if (instagramFallbackTimer) {
+        window.clearTimeout(instagramFallbackTimer);
+        instagramFallbackTimer = null;
       }
     });
   }
