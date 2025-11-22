@@ -103,7 +103,7 @@
           { type: 'standard', text: "motd - Message of the day" },
           { type: 'standard', text: "fortune - Random quote" },
           { type: 'standard', text: "ascii art - Render the Matrix-flavored logo" },
-          { type: 'standard', text: "instagram - Dance photo gallery" },
+          { type: 'standard', text: "instagram - Dance photography project" },
           { type: 'standard', text: "matrix - Enter the matrix" },
           { type: 'standard', text: "play - Play a random track from /music" },
           { type: 'standard', text: "stop - Stop the current track" }
