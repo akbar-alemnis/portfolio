@@ -3,6 +3,12 @@
   const consoleForm = document.querySelector('.console__form');
   const input = document.getElementById('console-input');
   const yearEl = document.getElementById('year');
+  const instagramPanel = document.getElementById('instagram-panel');
+  const instagramClose = document.getElementById('instagram-close');
+  const instagramFallback = document.getElementById('instagram-fallback');
+  const instagramFallbackTitle = document.getElementById('instagram-fallback-title');
+  const instagramFallbackCopy = document.getElementById('instagram-fallback-copy');
+  const instagramGallery = document.getElementById('instagram-gallery');
 
   if (!consoleOutput || !consoleForm || !input) {
     return;
@@ -13,7 +19,6 @@
   audioPlayer.preload = 'auto';
   const musicFolder = 'music/';
   const musicTracks = [
-    // Add your mp3 filenames here, e.g. 'track1.mp3', 'track2.mp3'
     'futuristic-synthwave-track-227035.mp3', 'retro-lounge-389644.mp3', 'retro-vibes-402459.mp3', 'tense-neo-noir-437990.mp3', '8-bit-game-158815.mp3'
   ];
 
@@ -98,7 +103,8 @@
           { type: 'standard', text: "motd - Message of the day" },
           { type: 'standard', text: "fortune - Random quote" },
           { type: 'standard', text: "ascii art - Render the Matrix-flavored logo" },
-          { type: 'standard', text: "matrix - Toggle falling green characters" },
+          { type: 'standard', text: "instagram - Dance photography project" },
+          { type: 'standard', text: "matrix - Enter the matrix" },
           { type: 'standard', text: "play - Play a random track from /music" },
           { type: 'standard', text: "stop - Stop the current track" }
         ];
@@ -189,6 +195,10 @@
         startMatrix();
         return [{ type: 'system', text: 'Matrix stream engaged. Press "matrix" again to stop.' }];
       }
+    },
+    instagram: {
+      description: 'Toggle Instagram feed',
+      action: () => toggleInstagramPanel()
     },
     play: {
       description: 'Play a random track from /music',
@@ -351,5 +361,192 @@
 
   if (yearEl) {
     yearEl.textContent = new Date().getFullYear().toString();
+  }
+
+  const photoManifestUrl = 'dance-photos/manifest.json';
+  let galleryLoaded = false;
+
+  const setGalleryStatus = (title, copy, shouldShow = true) => {
+    if (instagramFallbackTitle) {
+      instagramFallbackTitle.textContent = title;
+    }
+    if (instagramFallbackCopy) {
+      instagramFallbackCopy.textContent = copy;
+    }
+    if (instagramFallback) {
+      instagramFallback.classList.toggle('is-visible', shouldShow);
+    }
+  };
+
+  const renderGallery = (photos) => {
+    if (!instagramGallery) {
+      return;
+    }
+
+    instagramGallery.innerHTML = '';
+
+    photos.forEach((photo) => {
+      const tile = document.createElement('div');
+      tile.className = 'side-panel__tile';
+      tile.style.backgroundImage = `url(${photo})`;
+      tile.setAttribute('role', 'img');
+      tile.setAttribute('aria-label', 'Dance photo from @akilius_');
+      // open clicked image in a fullscreen lightbox
+      tile.addEventListener('click', () => {
+        openLightbox(photo);
+      });
+
+      instagramGallery.appendChild(tile);
+    });
+
+    if (instagramFallback) {
+      instagramFallback.classList.remove('is-visible');
+    }
+  };
+
+  // Lightbox implementation (background-frame approach to discourage saving)
+  let lightboxEl = null;
+
+  const createLightbox = () => {
+    if (lightboxEl) return lightboxEl;
+
+    lightboxEl = document.createElement('div');
+    lightboxEl.className = 'lightbox';
+    lightboxEl.setAttribute('role', 'dialog');
+    lightboxEl.setAttribute('aria-modal', 'true');
+    lightboxEl.tabIndex = -1;
+
+    const frame = document.createElement('div');
+    frame.className = 'lightbox__frame';
+    frame.setAttribute('role', 'img');
+    frame.setAttribute('aria-label', 'Dance photo fullscreen preview');
+
+    // prevent right-click and dragging to discourage saving
+    frame.addEventListener('contextmenu', (e) => e.preventDefault());
+    frame.addEventListener('dragstart', (e) => e.preventDefault());
+
+    const closeBtn = document.createElement('button');
+    // reuse sidebar close styles so it looks identical
+    closeBtn.className = 'side-panel__close lightbox__close';
+    closeBtn.type = 'button';
+    closeBtn.setAttribute('aria-label', 'Close image');
+    closeBtn.innerHTML = '✕';
+
+    closeBtn.addEventListener('click', closeLightbox);
+
+    // clicking backdrop closes unless clicking the frame itself
+    lightboxEl.addEventListener('click', (ev) => {
+      if (ev.target === lightboxEl) {
+        closeLightbox();
+      }
+    });
+
+    // clicking inside frame should not close
+    frame.addEventListener('click', (ev) => ev.stopPropagation());
+
+    lightboxEl.appendChild(frame);
+    lightboxEl.appendChild(closeBtn);
+    document.body.appendChild(lightboxEl);
+
+    // prevent right-click on the overlay too
+    lightboxEl.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    return lightboxEl;
+  };
+
+  const openLightbox = (src) => {
+    const lb = createLightbox();
+    const frame = lb.querySelector('.lightbox__frame');
+    frame.style.backgroundImage = `url(${src})`;
+    // show with animation
+    window.requestAnimationFrame(() => lb.classList.add('is-visible'));
+    document.body.style.overflow = 'hidden';
+    lb.focus && lb.focus();
+  };
+
+  const closeLightbox = () => {
+    if (!lightboxEl) return;
+    lightboxEl.classList.remove('is-visible');
+    document.body.style.overflow = '';
+    // clear background after animation to release memory
+    setTimeout(() => {
+      const frame = lightboxEl.querySelector('.lightbox__frame');
+      if (frame) frame.style.backgroundImage = '';
+    }, 360);
+  };
+
+  // Close on ESC key
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') {
+      closeLightbox();
+    }
+  });
+
+  const normalizePhotos = (data) => {
+    if (Array.isArray(data)) {
+      return data;
+    }
+    if (data && Array.isArray(data.photos)) {
+      return data.photos;
+    }
+    return [];
+  };
+
+  const loadLocalGallery = () => {
+    if (galleryLoaded || !instagramGallery) {
+      return;
+    }
+
+    setGalleryStatus('Loading dance snaps…', 'Fetching the local gallery. Add photos into /dance-photos/ to feature them here.', true);
+
+    fetch(photoManifestUrl, { cache: 'no-store' })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Manifest not found');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        const photos = normalizePhotos(data).filter(Boolean);
+
+        if (!photos.length) {
+          setGalleryStatus('Gallery warming up', 'Drop .jpg or .png files into /dance-photos/ and list them in manifest.json.', true);
+          return;
+        }
+
+        renderGallery(photos.map((name) => `${photoManifestUrl.replace('manifest.json', '')}${name}`));
+        galleryLoaded = true;
+      })
+      .catch(() => {
+        setGalleryStatus('Gallery offline', 'Could not load /dance-photos/manifest.json. Add your files and refresh to showcase them.', true);
+      });
+  };
+
+  const toggleInstagramPanel = () => {
+    if (!instagramPanel) {
+      return [{ type: 'warning', text: 'Instagram panel unavailable.' }];
+    }
+
+    const isActive = instagramPanel.classList.toggle('side-panel--active');
+    instagramPanel.setAttribute('aria-hidden', String(!isActive));
+
+    if (isActive) {
+      loadLocalGallery();
+    }
+
+    if (!isActive) {
+      return [{ type: 'system', text: 'Instagram gallery retracted. Command deck standing by.' }];
+    }
+
+    return [{ type: 'system', text: 'Instagram-inspired gallery docked on the right. Type "instagram" again to hide.' }];
+  };
+
+  if (instagramClose) {
+    instagramClose.addEventListener('click', () => {
+      if (instagramPanel && instagramPanel.classList.contains('side-panel--active')) {
+        instagramPanel.classList.remove('side-panel--active');
+        instagramPanel.setAttribute('aria-hidden', 'true');
+      }
+    });
   }
 })();
